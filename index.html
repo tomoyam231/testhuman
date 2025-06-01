@@ -7,41 +7,59 @@
     body { margin: 0; overflow: hidden; }
     canvas { display: block; }
   </style>
-  <!-- 非モジュール版 three.js + GLTFLoader + OrbitControls を読み込み -->
+
+  <!-- three.js本体 -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/loaders/GLTFLoader.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/controls/OrbitControls.js"></script>
+
+  <!-- OrbitControlsをバインド -->
+  <script>
+    // OrbitControls を THREE に手動で追加する
+    function loadScript(url, callback) {
+      const script = document.createElement('script');
+      script.onload = callback;
+      script.src = url;
+      document.head.appendChild(script);
+    }
+
+    loadScript("https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/controls/OrbitControls.js", () => {
+      THREE.OrbitControls = THREE.OrbitControls;
+    });
+
+    loadScript("https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/loaders/GLTFLoader.js", start);
+  </script>
 </head>
 <body>
   <script>
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+    function start() {
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
 
-    const controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.target.set(0, 1.4, 0);
-    controls.update();
-    camera.position.set(0, 1.4, 3);
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.target.set(0, 1.4, 0);
+      controls.update();
+      camera.position.set(0, 1.4, 3);
 
-    scene.add(new THREE.DirectionalLight(0xffffff, 1));
-    scene.add(new THREE.AmbientLight(0x404040));
+      scene.add(new THREE.DirectionalLight(0xffffff, 1));
+      scene.add(new THREE.AmbientLight(0x404040));
 
-    const loader = new THREE.GLTFLoader();
-    loader.load('https://models.readyplayer.me/683c37240fd7e4abfdb6a2c4.glb', (gltf) => {
-      const model = gltf.scene;
-      model.scale.set(1.5, 1.5, 1.5);
-      model.position.y = -1.5;
-      scene.add(model);
-    });
+      const loader = new THREE.GLTFLoader();
+      loader.load('https://models.readyplayer.me/683c37240fd7e4abfdb6a2c4.glb', (gltf) => {
+        const model = gltf.scene;
+        model.scale.set(1.5, 1.5, 1.5);
+        model.position.y = -1.5;
+        scene.add(model);
+      });
 
-    function animate() {
-      requestAnimationFrame(animate);
-      renderer.render(scene, camera);
+      function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+      }
+
+      animate();
     }
-
-    animate();
   </script>
 </body>
 </html>
